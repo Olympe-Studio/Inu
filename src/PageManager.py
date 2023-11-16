@@ -44,18 +44,25 @@ class PageManager:
         """
         Fetches the webpage from the internet and sets the page content.
         """
-        response = requests.get(self.url, timeout=5)
+        try:
+            response = requests.get(self.url, timeout=10)  # Timeout in seconds
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, "html.parser")
+                config = {}
+                if self.args.cssClass is not None:
+                    config["class"] = self.args.cssClass
+                if self.args.id is not None:
+                    config["id"] = self.args.id
 
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "html.parser")
-            config = {}
-            if self.args.cssClass is not None:
-                config["class"] = self.args.cssClass
-            if self.args.id is not None:
-                config["id"] = self.args.id
+                content_div = soup.find("div", config)
+                self.page = content_div
+        except requests.Timeout:
+            print("Request timed out")
+            self.page = None
+        except requests.RequestException as e:
+            print(f"Error fetching the page: {e}")
+            self.page = None
 
-            content_div = soup.find("div", config)
-            self.page = content_div
 
     def get_links(self, link_type):
         """
