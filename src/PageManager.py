@@ -1,74 +1,116 @@
-import requests
 from urllib.parse import urlparse
+import requests
 from bs4 import BeautifulSoup
 
 
 class PageManager:
-  _instances = {}
+    """
+    A class to manage webpage fetching and parsing.
+    It maintains instances based on URLs to avoid duplicate processing.
+    """
+    _instances = {}
 
-  def __new__(cls, url, args):
-    if url not in cls._instances:
-      cls._instances[url] = super(PageManager, cls).__new__(cls)
-    return cls._instances[url]
+    def __new__(cls, url, args):
+        """
+        Ensures a single instance per URL.
+        """
+        if url not in cls._instances:
+            cls._instances[url] = super(PageManager, cls).__new__(cls)
+        return cls._instances[url]
+
+    def __init__(self, url, args):
+        """
+        Initializes the PageManager instance with a URL and arguments.
+        """
+        if hasattr(self, "initialized"):
+            return
+
+        self.initialized = True
+        self.url = url
+        self.args = args
+        self.page = None
+
+    def fetch_page(self):
+        """
+        Fetches the webpage content. If already fetched, returns the cached page.
+        """
+        if self.page is not None:
+            return self.page
+
+        self.set_page()
+        return self.page
+
+    def set_page(self):
+        """
+        Fetches the webpage from the internet and sets the page content.
+        """
+        try:
+            response = requests.get(self.url, timeout=10)  # Timeout in seconds
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, "html.parser")
+                config = {}
+                if self.args.cssClass is not None:
+                    config["class"] = self.args.cssClass
+                if self.args.id is not None:
+                    config["id"] = self.args.id
+
+                content_div = soup.find("div", config)
+                self.page = content_div
+        except requests.Timeout:
+            print("Request timed out")
+            self.page = None
+        except requests.RequestException as e:
+            print(f"Error fetching the page: {e}")
+            self.page = None
 
 
-  def __init__(self, url, args):
-    if hasattr(self, 'initialized'):
-      return
-    self.initialized = True
-    self.url = url
-    self.args = args
-    self.page = None
+    def get_links(self, link_type):
+        """
+        Extracts and returns links from the page based on the specified link type
+        (internal / external).
 
-  def fetchPage(self):
-    if self.page is not None:
-      return self.page
+          Args:
+            - link_type  str  The type of link, either internal or external.
+        """
+        links = []
+        content_div = self.fetch_page()
 
-    self.setPage()
-    return self.page
+        if content_div is not None:
+            if content_div:
+                anchors = content_div.find_all("a")
+                for anchor in anchors:
+                    href = anchor.get("href")
+                    anchor_text = anchor.string
+                    if href:
+                        parsed_url = urlparse(href)
+                        current_domain = urlparse(self.url).netloc
+                        if link_type == "internal" and (
+                            href.startswith("/") or parsed_url.netloc == current_domain
+                        ):
+                            links.append((anchor_text, href))
+                        elif (
+                            link_type == "external"
+                            and parsed_url.netloc
+                            and parsed_url.netloc != current_domain
+                        ):
+                            links.append((anchor_text, href))
+        return links
 
-  def setPage(self):
-    response = requests.get(self.url)
-    if response.status_code == 200:
-      soup = BeautifulSoup(response.text, 'html.parser')
-      config = {}
-      if (self.args.cssClass is not None):
-        config['class'] = self.args.cssClass
-      if (self.args.id is not None):
-        config['id'] = self.args.id
+    def count_words(self):
+        """
+        Counts and returns the number of words in the content of the fetched page.
+        """
+        div = self.fetch_page()
+        if div is not None:
+            text = div.stripped_strings
+            words = " ".join(text).split()
+            return len(words)
 
-      contentDiv = soup.find('div', config)
-      self.page = contentDiv
+        return 0
 
-
-  def getLinks(self, linkType):
-    links = []
-    contentDiv = self.fetchPage()
-
-    if contentDiv is not None:
-      if contentDiv:
-        anchors = contentDiv.find_all('a')
-        for anchor in anchors:
-          href = anchor.get('href')
-          anchorText = anchor.string
-          if href:
-            parsedUrl = urlparse(href)
-            currentDomain = urlparse(self.url).netloc
-            if linkType == 'internal' and (href.startswith('/') or parsedUrl.netloc == currentDomain):
-              links.append((anchorText, href))
-            elif linkType == 'external' and parsedUrl.netloc and parsedUrl.netloc != currentDomain:
-              links.append((anchorText, href))
-    return links
-
-  def countWords(self):
-    div = self.fetchPage()
-    if div is not None:
-      text = div.stripped_strings
-      words = ' '.join(text).split()
-      return len(words)
-
-    return 0
-
-  @staticmethod
-  def getPage(url, args):
-    return PageManager(url, args)
+    @staticmethod
+    def get_page(url, args):
+        """
+        Static method to get or create a PageManager instance for a given URL and arguments.
+        """
+        return PageManager(url, args)
