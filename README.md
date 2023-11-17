@@ -64,4 +64,5 @@ Replace http://example.com, someClass, someId, and "keyword" with the actual val
 
 ## Support
 
-For support, issues, or contributions, please visit the GitHub repository.
+For support, issues, or contributions, please send us a message at hello@olympe-studio.xyz
+or, [visit our website](https://www.olympe-studio.xyz)
