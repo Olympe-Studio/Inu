@@ -1,41 +1,33 @@
-import argparse
-from src.PageManager import PageManager
+import click
+from src.modules.analyze.links import analyze_links
+from src.modules.keyword.keywords import get_volume
 
-# ANSI color codes
-GREEN = "\033[92m"
-ENDC = "\033[0m"
+@click.group()
+def cli():
+    pass
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Get internal and external links from a webpage."
-    )
-    parser.add_argument("url", type=str, help="The URL of the webpage to analyze.")
-    parser.add_argument(
-        "--cssClass", type=str, help="The class to find in", required=False
-    )
-    parser.add_argument("--id", type=str, help="The id to find in", required=False)
-    args = parser.parse_args()
-    url = args.url
+@click.command("analyze")
+@click.argument('url', type=str)
+@click.option('--css-class', type=str, help="The class to find in", required=False)
+@click.option('--id', type=str, help="The ID to find in", required=False)
+def analyze(url, css_class, id):
+    """Analyze an URL and returns relevant informations such as word count, internal and external links."""
+    analyze_links(url, css_class, id)
 
-    page = PageManager.get_page(url, args)
-    words = page.count_words()
-    internalLinks = page.get_links("internal")
-    externalLinks = page.get_links("external")
-    print(" ")
-    print(f"\033[93m|> NUMBER OF WORDS : {words} \033[0m")
-    print(" ")
 
-    print("\033[94m------------------------")
-    print("  INTERNAL LINKS")
-    print("------------------------\033[0m")
+@click.command("kw_volume")
+@click.argument('kw', type=str)
+@click.option('--locale', type=str, help="Restrict the data to a specific language.", required=False)
+def kw_volume(kw, locale):
+    get_volume(kw, locale.upper())
 
-    for anchorText, link in internalLinks:
-        print(f"{GREEN}{anchorText}{ENDC} : {link}")
 
-    print("\033[91m------------------------")
-    print("  EXTERNAL LINKS")
-    print("------------------------\033[0m")
 
-    for anchorText, link in externalLinks:
-        print(f"{GREEN}{anchorText}{ENDC} : {link}")
+
+cli.add_command(analyze)
+cli.add_command(kw_volume)
+
+
+if __name__ == '__main__':
+    cli()
