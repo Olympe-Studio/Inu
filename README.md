@@ -1,6 +1,12 @@
 # INU
 
-Inu is a command line interface
+Inu is a versatile Command Line Interface designed to streamline and simplify your SEO analysis workflow.
+
+Built with efficiency in mind, this tool leverages the power of your terminal to run specific SEO analysis commands instead of wasting time in a slow web app with tons of useless features.
+
+- **URL Analysis (`analyze`)**: Quickly analyze a given URL to extract word count, as well as internal and external links and anchors.
+- **Keyword Volume Analysis (`kw`)**: Obtain search volume estimation for a specific keyword.
+
 
 ## Overview
 
@@ -51,7 +57,7 @@ inu --help
 inu analyze http://example.com --css-class=someClass --id=someId
 
 # Get a volume estimation for a specific keyword with the provided locale restrictions (or not).
-inu kw_volume "keyword" --locale=en
+inu kw your_keyword --locale=en
 ```
 
 Replace http://example.com, someClass, someId, and "keyword" with the actual values you wish to use.

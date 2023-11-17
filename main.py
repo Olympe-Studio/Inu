@@ -16,17 +16,17 @@ def analyze(url, css_class, id):
     analyze_links(url, css_class, id)
 
 
-@click.command("kw_volume")
+@click.command("kw")
 @click.argument('kw', type=str)
 @click.option('--locale', type=str, help="Restrict the data to a specific language.", required=False)
-def kw_volume(kw, locale):
+def kw(kw, locale):
     get_volume(kw, locale.upper())
 
 
 
 
 cli.add_command(analyze)
-cli.add_command(kw_volume)
+cli.add_command(kw)
 
 
 if __name__ == '__main__':
