@@ -1,51 +1,68 @@
-# Webpage Link Analyzer
+# INU
+
+Inu is a versatile Command Line Interface designed to streamline and simplify your SEO analysis workflow.
+
+Built with efficiency in mind, this tool leverages the power of your terminal to run specific SEO analysis commands instead of wasting time in a slow web app with tons of useless features.
+
+- **URL Analysis (`analyze`)**: Quickly analyze a given URL to extract word count, as well as internal and external links and anchors.
+- **Keyword Volume Analysis (`kw`)**: Obtain search volume estimation for a specific keyword.
+
 
 ## Overview
 
-This script is designed to analyze a specific webpage and extract useful information such as :
+This CLI is designed to provide SEO Feedbacks using simple terminal commands :
 - The number of words,
 - The internal links,
 - The external links.
 
 It allows filtering based on CSS class and ID attributes.
 
-## Requirements
 
-- Python3
+## Prerequisites
 
-Make sure Python 3 is installed on your system. You can install the required Python packages using pip:
+Before you install Inu, make sure you have the following prerequisites installed:
+
+- Python 3
+- Git
+- Pip (Python package installer)
+
+## Installation
+
+You can install Inueither by using pip.
+
+1. Clone the repository:
 
 ```bash
-pip install -r requirements.txt
+git clone https://github.com/your-username/inu.git inu
+# Navigate to the cloned directory:
+cd inu
+```
+
+2. Run the following command to install the CLI :
+
+```bash
+pip install .
 ```
 
 ## Usage
 
-Run the script from the command line, passing the URL of the webpage you want to analyze as an argument. You can also specify optional arguments for CSS class and ID to filter the content
-
-### Command Line Arguments
-
-- `url`: The URL of the webpage to analyze (required).
-- `--cssClass`: The CSS class to filter the content (optional).
-- `--id`: The ID to filter the content (optional).
-
-### Exemple
+After installation, you can use the inu command to interact with the SEO tools.
+Here are some examples:
 
 ```bash
-python main.py https://www.example.com --id content
+# Display help information
+inu --help
+
+# Analyse the provided page to get fast insights (number of words, internal & external links with anchors)
+inu analyze http://example.com --css-class=someClass --id=someId
+
+# Get a volume estimation for a specific keyword with the provided locale restrictions (or not).
+inu kw your_keyword --locale=en
 ```
 
-This command analyzes the webpage at https://www.example.com, included into the div with id 'content'.
+Replace http://example.com, someClass, someId, and "keyword" with the actual values you wish to use.
 
-### Output
-The script outputs the following information:
+## Support
 
-- Number of words on the page.
-- List of internal links (links to the same domain).
-- List of external links (links to different domains).
-- Each link is presented with its anchor text and URL.
-
-##  Customization
-You can customize the script by modifying the source code to suit specific requirements, such as adding more filtering options or extracting different types of data from the webpage.
-
-**Note: This script is for educational and analytical purposes. Ensure you have permission to scrape the website and respect the website's terms of service and robots.txt file.**
+For support, issues, or contributions, please send us a message at hello@olympe-studio.xyz
+or, [visit our website](https://www.olympe-studio.xyz)

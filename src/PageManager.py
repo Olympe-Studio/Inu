@@ -49,12 +49,16 @@ class PageManager:
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, "html.parser")
                 config = {}
-                if self.args.cssClass is not None:
-                    config["class"] = self.args.cssClass
-                if self.args.id is not None:
-                    config["id"] = self.args.id
 
-                content_div = soup.find("div", config)
+                if self.args.get('cssClass') is not None:
+                    content_div = soup.select_one("." + self.args.get('cssClass'))
+
+                if self.args.get('id') is not None:
+                    content_div = soup.select_one("#" + self.args.get('id'))
+
+                if content_div is None:
+                    return
+
                 self.page = content_div
         except requests.Timeout:
             print("Request timed out")
@@ -69,7 +73,7 @@ class PageManager:
         Extracts and returns links from the page based on the specified link type
         (internal / external).
 
-          Args:
+        Args:
             - link_type  str  The type of link, either internal or external.
         """
         links = []
