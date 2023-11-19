@@ -9,7 +9,12 @@ def get_volume(kw, locale):
     keywords = [kw]
     pytrends.build_payload(kw_list=keywords, timeframe='today 12-m', geo=locale)
 
+
     interest_over_time_df = pytrends.interest_over_time()
+    if not kw in interest_over_time_df.columns:
+        print("Keyword not found in data")
+        return
+
     # Resample the data to monthly frequency, calculating the mean for each month
     yearly_average = interest_over_time_df[kw].mean()
     monthly_interest = interest_over_time_df.resample('M').mean()
